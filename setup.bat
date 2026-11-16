@@ -4,7 +4,8 @@ cd /d "%~dp0"
 echo.
 echo ===== 1. Kontrolloj programet =====
 where git >nul 2>&1 && (git --version) || echo GABIM: Git nuk u gjet. Instalo nga https://git-scm.com
-where claude >nul 2>&1 && (call claude --version) || echo GABIM: Claude Code nuk u gjet ne PATH.
+set "PATH=%USERPROFILE%\.local\bin;%PATH%"
+where claude >nul 2>&1 && (call claude --version) || echo GABIM: Claude Code nuk u gjet. Kliko dy here install-claude-code.bat
 "%~dp0rojo.exe" --version || echo GABIM: rojo.exe nuk punon.
 
 echo.
@@ -25,6 +26,9 @@ if not exist .git (
   git config user.email >nul 2>&1 || git config user.email "elezirei8@gmail.com"
   git add -A
   git commit -q -m "Roblox Daily Game: 2 llogari, publikim ditor me kontrolle anti-spam"
+) else (
+  git add -A
+  git diff --cached --quiet || git commit -q -m "Perditesim i konfigurimit"
 )
 git log --oneline -1
 git status --short

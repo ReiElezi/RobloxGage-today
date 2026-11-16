@@ -119,6 +119,8 @@ function Test-Game([string]$dir, $game, [string[]]$previousTitles) {
 # ---------------- Kontrollet fillestare ----------------
 Step "Kontrolloj programet dhe konfigurimin"
 if (Test-Path (Join-Path $Root 'rojo.exe')) { $env:PATH = "$Root;$env:PATH" }
+$claudeBin = Join-Path $env:USERPROFILE '.local\bin'
+if (Test-Path $claudeBin) { $env:PATH = "$claudeBin;$env:PATH" }
 foreach ($cmd in 'claude', 'rojo') {
     if (-not (Get-Command $cmd -ErrorAction SilentlyContinue)) { Fail "'$cmd' nuk u gjet. Shiko README.md, hapi 1." }
 }
