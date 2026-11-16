@@ -282,9 +282,18 @@ foreach ($acc in $accounts) {
 
         $link = "https://www.roblox.com/games/$($slot.placeId)"
         Write-Host "`nU PUBLIKUA! Versioni $($resp.versionNumber) - $link" -ForegroundColor Green
-        Write-Host "Titulli/pershkrimi per Creator Dashboard:"
-        Write-Host "  $($game.title)"
-        Write-Host "  $($game.description)"
+        # Emri dhe pershkrimi i lojes ne Roblox = ato te lojes se re (qe te mos jene mashtruese)
+        try {
+            $meta = @{ displayName = [string]$game.title; description = [string]$game.description } | ConvertTo-Json
+            $metaUri = "$apiBase/cloud/v2/universes/$($slot.universeId)/places/$($slot.placeId)?updateMask=displayName,description"
+            Invoke-RestMethod -Method Patch -Uri $metaUri -Headers @{ 'x-api-key' = $apiKey } `
+                -ContentType 'application/json; charset=utf-8' -Body ([Text.Encoding]::UTF8.GetBytes($meta)) | Out-Null
+            Write-Host "Emri dhe pershkrimi u vendosen automatikisht ne Roblox." -ForegroundColor Green
+        } catch {
+            Warn "Emri/pershkrimi nuk u ndryshuan automatikisht ($($_.Exception.Message)). Vendosi me dore ne Creator Dashboard:"
+            Write-Host "  $($game.title)"
+            Write-Host "  $($game.description)"
+        }
 
         $history = @($history) + [pscustomobject]@{
             date    = $date
