@@ -60,6 +60,8 @@ Duhen 2 **GitHub Secrets** (Settings → Secrets and variables → Actions):
 - `CLAUDE_CODE_OAUTH_TOKEN` — nga komanda `claude setup-token` (abonimi yt Claude)
 - `ROBLOX_API_KEY_1` — çelësi API i Llogarisë 1 (universe-places → Write për të gjitha lojërat e rezervës)
 
+**Lojërat e reja bosh duhet të kenë Team Create të fikur** (Studio e ndez vetë kur krijon lojë; me të ndezur publikimi jep gabimin 409).
+
 `config.json` dhe `history.json` janë në repo (s'kanë sekrete, vetëm numrat publikë të lojërave).
 
 ---
