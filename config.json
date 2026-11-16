@@ -5,7 +5,10 @@
       "apiKeyEnv": "ROBLOX_API_KEY_1",
       "style": "Bright, colorful, fast-paced games for younger players.",
       "slots": [
-        { "name": "Fresh Game Daily", "universeId": 10777186865, "placeId": 93084390023345 }
+        { "name": "Fresh Game Daily", "universeId": 10777186865, "placeId": 93084390023345 },
+        { "name": "Fresh Game Daily 2", "universeId": 10777192998, "placeId": 76759639764897 },
+        { "name": "Fresh Game Daily 3", "universeId": 10777193519, "placeId": 125569715056924 },
+        { "name": "Fresh Game Daily 4", "universeId": 10777193826, "placeId": 93497117715087 }
       ]
     }
   ]
