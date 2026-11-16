@@ -215,6 +215,12 @@ foreach ($acc in $accounts) {
 
         Step "Claude Code po krijon lojen per '$($acc.name)' (10-30 min)..."
         Invoke-Claude -dir $dir -text $prompt
+        $claudeExit = $LASTEXITCODE
+        $logFile = Join-Path $dir 'claude-log.txt'
+        $logTail = if (Test-Path $logFile) { ((Get-Content $logFile -Encoding UTF8 -ErrorAction SilentlyContinue | Select-Object -Last 15) -join "`n") } else { '(claude-log.txt mungon)' }
+        if ($claudeExit -ne 0 -or -not (Test-Path (Join-Path $dir 'game.json'))) {
+            throw "Claude Code nuk e krijoi lojen (kodi $claudeExit). Fundi i log-ut:`n$logTail"
+        }
 
         # Build + kontrolle, me nje rrethim riparimi automatik
         $place = $null; $game = $null; $problems = @()
@@ -233,7 +239,7 @@ foreach ($acc in $accounts) {
                 Invoke-Claude -dir $dir -text $fix -Continue
             }
         }
-        if ($problems.Count -gt 0) { throw "Loja nuk kaloi kontrollet - NUK publikohet. Shiko $dir" }
+        if ($problems.Count -gt 0) { throw ("Loja nuk kaloi kontrollet - NUK publikohet:`n- " + ($problems -join "`n- ")) }
         # Zhanri i sotem rezervohet qe llogaria tjeter te beje dicka ndryshe
         $todayGenres.Add([string]$game.genre)
 

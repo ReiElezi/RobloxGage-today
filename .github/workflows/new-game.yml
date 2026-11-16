@@ -114,6 +114,8 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           OWNER: ${{ github.repository_owner }}
           ACCOUNT: ${{ inputs.account }}
+          HAS_CLAUDE: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
+          HAS_ROBLOX: ${{ secrets.ROBLOX_API_KEY_1 != '' }}
         run: |
           $results = @()
           if (Test-Path last-result.json) { $results = @(Get-Content last-result.json -Raw -Encoding UTF8 | ConvertFrom-Json) }
@@ -132,7 +134,8 @@ jobs:
               $body = "@$env:OWNER $($r.error) Loja e sotme: $($r.title)"
             } else {
               $title = "Gabim: loja nuk u krijua"
-              $body = "@$env:OWNER puna deshtoi: $($r.error)"
+              $fence = '```'
+              $body = "@$env:OWNER puna deshtoi:`n`n$fence`n$($r.error)`n$fence`n`nSekretet: CLAUDE_CODE_OAUTH_TOKEN=$env:HAS_CLAUDE, ROBLOX_API_KEY_1=$env:HAS_ROBLOX"
             }
             $body += "`n`nDetajet: $env:RUN_URL"
             gh issue create --title $title --body $body
