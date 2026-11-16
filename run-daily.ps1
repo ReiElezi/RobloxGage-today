@@ -19,7 +19,8 @@ param(
     [switch]$Preview,
     [switch]$NoPublish,
     [switch]$Force,
-    [string]$Account
+    [string]$Account,
+    [string]$Genre        # p.sh. "obby"; bosh ose "auto" = Claude zgjedh nga Top 10
 )
 
 $ErrorActionPreference = 'Stop'
@@ -149,6 +150,7 @@ $todayGenres = [System.Collections.Generic.List[string]]::new()
 foreach ($h in $history) { if ($h.date -eq $date -and $h.genre) { $todayGenres.Add([string]$h.genre) } }
 
 $summary = @()
+$results = @()
 $index = 0
 
 # ---------------- Per cdo llogari ----------------
@@ -168,12 +170,20 @@ foreach ($acc in $accounts) {
             if (-not $apiKey) { throw "Mungon API key: variabli $($acc.apiKeyEnv) nuk eshte vendosur (README, hapi 3)." }
             if ($slots.Count -eq 0) { throw "Kjo llogari nuk ka slot me universeId/placeId te sakte." }
         }
+        # Rezerva: perdoren vetem lojerat bosh (qe s'jane publikuar kurre). Lojerat e vjetra nuk prekan.
+        $usedIds = @($history | ForEach-Object { [string]$_.placeId })
+        $freeSlots = @($slots | Where-Object { $usedIds -notcontains [string]$_.placeId })
+        if (-not $NoPublish -and $freeSlots.Count -eq 0) {
+            throw "Rezerva mbaroi: te gjitha $($slots.Count) lojerat jane perdorur. Krijo lojera te reja bosh dhe shtoji te config.json."
+        }
 
         # Anti-spam: maksimumi 1 publikim ne dite per llogari
         $doneToday = @($history | Where-Object { $_.account -eq $acc.name -and $_.date -eq $date })
         if ($doneToday.Count -gt 0 -and -not $Force -and -not $NoPublish) {
             Write-Host "Kjo llogari ka publikuar sot ('$($doneToday[0].title)'). E kaloj (maksimumi 1 loje/dite)." -ForegroundColor Yellow
             $summary += "$($acc.name): u kalua - u publikua tashme sot"
+            $results += [pscustomobject]@{ status = 'skipped'; account = [string]$acc.name; title = [string]$doneToday[0].title
+                error = 'Sot eshte publikuar tashme nje loje (maksimumi 1 ne dite).' }
             continue
         }
 
@@ -198,6 +208,10 @@ foreach ($acc in $accounts) {
         $prompt = Get-Content (Join-Path $Root 'prompts\daily-game.md') -Raw -Encoding UTF8
         $prompt = $prompt.Replace('{{DATE}}', $date).Replace('{{AVOID_GENRES}}', $avoidText).
             Replace('{{PREVIOUS_TITLES}}', $titlesText).Replace('{{STYLE}}', $style)
+
+        if ($Genre -and $Genre -ne 'auto') {
+            $prompt += "`n`n## OWNER'S CHOICE (overrides Step 2)`nThe owner chose today's genre: **$Genre**. Build a game in exactly this genre (still research the top 10 for inspiration, still original, still English only). Ignore the avoid-genres list for this choice.`n"
+        }
 
         Step "Claude Code po krijon lojen per '$($acc.name)' (10-30 min)..."
         Invoke-Claude -dir $dir -text $prompt
@@ -236,15 +250,8 @@ foreach ($acc in $accounts) {
                         continue
         }
 
-        # Zgjedh slot-in: fillimisht ato qe s'jane perdorur kurre (sipas radhes ne config),
-        # pastaj ate qe eshte perditesuar me heret. Keshtu lojerat e diteve te fundit mbeten.
-        $slot = $null; $oldest = $null
-        foreach ($s in $slots) {
-            $last = @($history | Where-Object { [string]$_.placeId -eq [string]$s.placeId } |
-                      ForEach-Object { [string]$_.date } | Sort-Object) | Select-Object -Last 1
-            if (-not $last) { $slot = $s; break }
-            if (-not $oldest -or $last -lt $oldest) { $oldest = $last; $slot = $s }
-        }
+        # Loja e radhes bosh nga rezerva (sipas radhes ne config.json)
+        $slot = $freeSlots[0]
         if (-not $Auto) {
             $ans = Read-Host "`nTa publikoj LIVE '$($game.title)' te '$($acc.name)' / '$($slot.name)'? (po/jo)"
             if ($ans -notmatch '^(p|po|y|yes)$') {
@@ -289,14 +296,23 @@ foreach ($acc in $accounts) {
             version = $resp.versionNumber
         }
         ConvertTo-Json -InputObject @($history) -Depth 5 | Set-Content -Path $histPath -Encoding UTF8
-                $summary += "$($acc.name): '$($game.title)' ($($game.genre)) LIVE - $link"
+        $left = $freeSlots.Count - 1
+        $summary += "$($acc.name): '$($game.title)' ($($game.genre)) LIVE - $link"
+        $results += [pscustomobject]@{ status = 'live'; account = [string]$acc.name; title = [string]$game.title
+            genre = [string]$game.genre; description = [string]$game.description; link = $link; slotsLeft = $left }
     } catch {
         Write-Host "`nGABIM te '$($acc.name)': $($_.Exception.Message)" -ForegroundColor Red
         $summary += "$($acc.name): GABIM - $($_.Exception.Message)"
+        $results += [pscustomobject]@{ status = 'error'; account = [string]$acc.name; error = $_.Exception.Message }
     }
 }
+
+# Rezultati per njoftimin ne GitHub
+ConvertTo-Json -InputObject @($results) -Depth 4 | Set-Content -Path (Join-Path $Root 'last-result.json') -Encoding UTF8
 
 Write-Host "`n================ PERMBLEDHJE ================" -ForegroundColor Cyan
 $summary | ForEach-Object { Write-Host " - $_" }
 
 try { Stop-Transcript | Out-Null } catch { }
+
+if (@($results | Where-Object { $_.status -eq 'error' }).Count -gt 0) { exit 1 }

@@ -1,0 +1,128 @@
+name: Krijo loje te re
+
+# Butoni: GitHub -> Actions -> "Krijo loje te re" -> Run workflow
+on:
+  workflow_dispatch:
+    inputs:
+      genre:
+        description: "Zhanri i lojes (auto = Claude zgjedh nga Top 10 e sotme)"
+        type: choice
+        default: auto
+        options:
+          - auto
+          - obby
+          - fashion / dress-up show
+          - battles / PvP fighting
+          - tycoon
+          - simulator
+          - tower defense
+          - collect-and-steal (brainrot)
+          - horror survival
+          - roleplay
+          - farming / garden
+          - fishing
+          - idle / clicker
+      account:
+        description: "Llogaria"
+        type: choice
+        default: Llogaria 1
+        options:
+          - Llogaria 1
+
+permissions:
+  contents: write   # ruan history.json ne repo
+  issues: write     # krijon njoftimin per telefonin
+
+concurrency:
+  group: new-game
+  cancel-in-progress: false
+
+jobs:
+  create:
+    runs-on: windows-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalo Claude Code dhe Rojo
+        shell: pwsh
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          Invoke-WebRequest -Uri https://github.com/rojo-rbx/rojo/releases/download/v7.4.4/rojo-7.4.4-windows-x86_64.zip -OutFile rojo.zip
+          Expand-Archive rojo.zip -DestinationPath . -Force
+          Remove-Item rojo.zip
+          claude --version
+          .\rojo.exe --version
+
+      - name: Krijo dhe publiko lojen
+        shell: pwsh
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          ROBLOX_API_KEY_1: ${{ secrets.ROBLOX_API_KEY_1 }}
+          GENRE: ${{ inputs.genre }}
+          ACCOUNT: ${{ inputs.account }}
+        run: |
+          .\run-daily.ps1 -Auto -Account $env:ACCOUNT -Genre $env:GENRE
+
+      - name: Ruaj historine
+        if: always()
+        shell: pwsh
+        run: |
+          if (-not (Test-Path history.json)) { exit 0 }
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add history.json
+          git diff --cached --quiet
+          if ($LASTEXITCODE -ne 0) {
+            git commit -m "Loje e re: historia u perditesua"
+            git pull --rebase
+            git push
+          }
+          exit 0
+
+      - name: Ruaj skedaret e lojes (per kontroll)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: loja-${{ github.run_number }}
+          path: |
+            games/
+            logs/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Njoftim ne telefon
+        if: always()
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          OWNER: ${{ github.repository_owner }}
+          ACCOUNT: ${{ inputs.account }}
+        run: |
+          $results = @()
+          if (Test-Path last-result.json) { $results = @(Get-Content last-result.json -Raw -Encoding UTF8 | ConvertFrom-Json) }
+          if ($results.Count -eq 0) {
+            $results = @([pscustomobject]@{ status = 'error'; account = $env:ACCOUNT; error = 'Puna u nderpre para se te mbaronte.' })
+          }
+          foreach ($r in $results) {
+            if ($r.status -eq 'live') {
+              $title = "Loje e re LIVE: $($r.title)"
+              $body = "@$env:OWNER loja e re eshte LIVE ne Roblox!`n`n" +
+                      "**$($r.title)** ($($r.genre))`n`n$($r.description)`n`n" +
+                      "Luaje: $($r.link)`n`nLojera bosh te mbetura ne rezerve: **$($r.slotsLeft)**"
+              if ([int]$r.slotsLeft -le 3) { $body += "`n`n**KUJDES:** rezerva po mbaron - krijo lojera te reja bosh." }
+            } elseif ($r.status -eq 'skipped') {
+              $title = "Nuk u krijua loje (sot u publikua nje tashme)"
+              $body = "@$env:OWNER $($r.error) Loja e sotme: $($r.title)"
+            } else {
+              $title = "Gabim: loja nuk u krijua"
+              $body = "@$env:OWNER puna deshtoi: $($r.error)"
+            }
+            $body += "`n`nDetajet: $env:RUN_URL"
+            gh issue create --title $title --body $body
+          }

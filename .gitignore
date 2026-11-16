@@ -1,8 +1,7 @@
-# Sekrete dhe gjera lokale - mos i fut ne git
-config.json
-history.json
+# Gjera lokale - mos i fut ne git (config.json dhe history.json JANE ne git: s'kane sekrete)
 games/
 rojo.exe
 *.rbxl
 *.rbxlx
 logs/
+last-result.json

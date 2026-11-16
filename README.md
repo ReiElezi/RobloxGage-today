@@ -27,7 +27,7 @@ Programi e respekton këtë kështu:
 
 | Rreziku | Si mbrohet |
 |---|---|
-| Ngarkime të përsëritura | **Nuk krijon kurrë lojë të re.** Përditëson të njëjtën lojë (slot) që ke krijuar një herë. **Maksimumi 1 publikim në ditë për llogari** (edhe nëse e nis 10 herë). |
+| Ngarkime të përsëritura | Programi nuk krijon vetë lojëra (Roblox nuk e lejon). Përdor **rezervën e lojërave bosh** që i ke krijuar një herë, dhe **nuk prek kurrë lojërat që janë publikuar** më parë. **Maksimumi 1 publikim në ditë për llogari** (edhe nëse e shtyp butonin 10 herë). |
 | Lojëra të njëjta në 2 llogaritë | Llogaria 2 **nuk lejohet** të bëjë të njëjtin zhanër si llogaria 1 atë ditë. Çdo llogari ka edhe **stilin** e vet (`style` te `config.json`). Titujt nuk përsëriten kurrë. |
 | Gjuha | Lojërat bëhen **vetëm në anglisht** (titulli, përshkrimi, të gjitha tekstet në lojë). Programi refuzon lojën nëse gjen tekst shqip. |
 | Tituj mashtrues / clickbait | Programi **refuzon** tituj me `[UPDATE]`, `FREE`, `ROBUX`, `x2`, `EVENT`, `SECRET`, `OG`, kllapa, ose me shkronja të mëdha. |
@@ -43,8 +43,24 @@ Nëse kontrolli dështon, programi i kërkon **një herë** Claude Code ta rregu
 1. **Mos i përdor 2 llogaritë për t'i rritur njëra-tjetrës vizitat, likes ose favorites.** Mos hyr me njërën llogari për të luajtur lojën e tjetrës për numra, dhe mos përdor bot-e. Kjo është manipulim.
 2. **Nëse njëra llogari merr ndalim (ban/warning), mos e vazhdo të njëjtën gjë me llogarinë tjetër.** Kjo është pikërisht ajo që ndalohet. Ndalo programin për atë llogari dhe kupto çfarë ndodhi.
 3. **Mos e përdor `-Force` çdo ditë.** Ekziston vetëm për rastin kur publikimi i parë doli me gabim.
-4. **Mos krijo shumë slot-e.** Kemi 7 lojëra për llogari (një për çdo ditë të javës). Mos shto shumë më tepër: dhjetëra lojëra që ndryshojnë vazhdimisht duken si spam.
+4. **Mos krijo shumë lojëra bosh njëherësh.** Rezerva është 14 lojëra. Kur mbaron, shto të tjera ngadalë (p.sh. 7–14 në një herë), jo qindra.
 5. **Provoje lojën** (`-Preview`), sidomos javën e parë.
+
+---
+
+## 🔘 Butoni në GitHub (mënyra kryesore)
+
+1. Hap https://github.com/ReiElezi/RobloxGage-today → **Actions** → **Krijo loje te re** → **Run workflow**.
+2. Zgjidh **zhanrin** (ose `auto` = Claude zgjedh nga Top 10 e sotme) dhe **llogarinë** → **Run workflow**.
+3. Puna bëhet në serverat e GitHub (20–40 min). Laptopi mund të jetë i fikur.
+4. Kur mbaron, krijohet një **Issue** te repo-ja me titullin dhe lidhjen e lojës → të vjen **njoftim në aplikacionin GitHub** në telefon.
+5. Nëse mbeten ≤ 3 lojëra bosh, njoftimi të paralajmëron.
+
+Duhen 2 **GitHub Secrets** (Settings → Secrets and variables → Actions):
+- `CLAUDE_CODE_OAUTH_TOKEN` — nga komanda `claude setup-token` (abonimi yt Claude)
+- `ROBLOX_API_KEY_1` — çelësi API i Llogarisë 1 (universe-places → Write për të gjitha lojërat e rezervës)
+
+`config.json` dhe `history.json` janë në repo (s'kanë sekrete, vetëm numrat publikë të lojërave).
 
 ---
 
@@ -154,7 +170,7 @@ Për 2 llogari duhen rreth **20–60 minuta**. Në fund shfaqet përmbledhja me 
 
 ## Gjëra të rëndësishme
 
-- Çdo ditë programi zgjedh një slot: fillimisht ato që s'janë përdorur kurrë, pastaj atë që është përditësuar më herët. Kështu **lojërat e 6 ditëve të fundit mbeten dhe luhen**; vetëm loja më e vjetër zëvendësohet.
+- Çdo herë programi përdor **lojën e radhës bosh** nga rezerva (`slots` te `config.json`). **Lojërat e vjetra mbeten online përgjithmonë.** Kur rezerva mbaron, programi ndalon dhe të njofton; nuk zëvendëson asnjë lojë.
 - **Titulli, përshkrimi dhe ikona nuk ndryshojnë automatikisht.** Programi t'i shfaq në fund: kopjoji te Creator Dashboard dhe përshtati me lojën e re, që të mos jenë mashtruese.
 - Çdo nisje harxhon nga limiti i abonimit tënd të Claude (2 lojëra = 2 herë më shumë).
 
