@@ -58,6 +58,17 @@ jobs:
           claude --version
           .\rojo.exe --version
 
+      - name: Kontrollo sekretet (tregon vetem PO/JO, kurre vleren)
+        shell: pwsh
+        env:
+          HAS_CLAUDE: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
+          HAS_ROBLOX: ${{ secrets.ROBLOX_API_KEY_1 != '' }}
+          HAS_ROBLOX_VAR: ${{ vars.ROBLOX_API_KEY_1 != '' }}
+        run: |
+          Write-Host "CLAUDE_CODE_OAUTH_TOKEN (secret): $env:HAS_CLAUDE"
+          Write-Host "ROBLOX_API_KEY_1 (secret): $env:HAS_ROBLOX"
+          if ($env:HAS_ROBLOX_VAR -eq 'true') { Write-Host "KUJDES: ROBLOX_API_KEY_1 eshte ruajtur te 'Variables' dhe jo te 'Secrets'. Fshije nga Variables dhe shtoje te Secrets." }
+
       - name: Krijo dhe publiko lojen
         shell: pwsh
         env:
