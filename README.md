@@ -1,5 +1,7 @@
 # Roblox Daily Game — 2 llogari 🎮🎮
 
+> 🤖 **Mënyra më e lehtë:** kliko dy herë **`start-claude-code.bat`**. Claude Code lexon `CLAUDE-CODE-HANDOFF.md` dhe të udhëheq hap pas hapi në shqip.
+
 Çdo herë që e nis (një herë në ditë), programi punon **për secilën llogari Roblox** me radhë:
 
 1. **Claude Code** gjen **top 10 lojërat që fitojnë më shumë sot** (Top Earning).
@@ -27,6 +29,7 @@ Programi e respekton këtë kështu:
 |---|---|
 | Ngarkime të përsëritura | **Nuk krijon kurrë lojë të re.** Përditëson të njëjtën lojë (slot) që ke krijuar një herë. **Maksimumi 1 publikim në ditë për llogari** (edhe nëse e nis 10 herë). |
 | Lojëra të njëjta në 2 llogaritë | Llogaria 2 **nuk lejohet** të bëjë të njëjtin zhanër si llogaria 1 atë ditë. Çdo llogari ka edhe **stilin** e vet (`style` te `config.json`). Titujt nuk përsëriten kurrë. |
+| Gjuha | Lojërat bëhen **vetëm në anglisht** (titulli, përshkrimi, të gjitha tekstet në lojë). Programi refuzon lojën nëse gjen tekst shqip. |
 | Tituj mashtrues / clickbait | Programi **refuzon** tituj me `[UPDATE]`, `FREE`, `ROBUX`, `x2`, `EVENT`, `SECRET`, `OG`, kllapa, ose me shkronja të mëdha. |
 | Kopjimi i lojërave të tjera | Refuzon titullin/përshkrimin që përmend emrin e një loje nga top 10. |
 | Lojë bosh / pa cilësi | Refuzon nëse kodi është shumë i vogel, nëse ka mbetur placeholder, ose nëse mungon SpawnLocation apo DESIGN.md. |
@@ -79,9 +82,8 @@ Edhe këtë bëje **dy herë**, i loguar në llogarinë përkatëse në shfletue
 4. Zgjidh lojën e kësaj llogarie → operacioni **Write**
 5. **Accepted IP Addresses**: `0.0.0.0/0` (ose IP-ja jote)
 6. **Save & Generate Key** → **Copy**
-7. Në PowerShell:
-   - për llogarinë 1: `setx ROBLOX_API_KEY_1 "ÇELËSI_I_LLOGARISË_1"`
-   - për llogarinë 2: `setx ROBLOX_API_KEY_2 "ÇELËSI_I_LLOGARISË_2"`
+7. Kliko dy herë **`set-api-keys.bat`** dhe ngjit çelësin e secilës llogari kur të pyesë
+   (teksti nuk shfaqet në ekran dhe nuk ruhet në asnjë skedar).
 8. **Mbyll dhe rihap PowerShell.**
 
 > 🔒 Mos i vendos çelësat në asnjë skedar dhe mos ia jep askujt. Mos i ngatërro: çelësi 1 punon vetëm për lojën e llogarisë 1.
@@ -110,7 +112,26 @@ Edhe këtë bëje **dy herë**, i loguar në llogarinë përkatëse në shfletue
    ```
    - `style` = stili i lojërave të asaj llogarie (në anglisht). Mbaji **të ndryshëm**, që të 2 llogaritë të mos duken njësoj.
 
-## Hapi 5 — Nise (një herë në ditë)
+## Hapi 5 — Ruaje në GitHub
+
+Kliko dy herë **`setup.bat`**. Ai:
+- kontrollon Git, Claude Code dhe Rojo,
+- ruan ndryshimet në git (me adresën noreply të GitHub, jo me email-in tënd personal),
+- i dërgon te https://github.com/ReiElezi/RobloxGage-today
+
+Herën e parë mund të të kërkojë login në GitHub në shfletues.
+`config.json`, `history.json`, `games/`, `logs/` dhe `rojo.exe` **nuk dërgohen kurrë** në GitHub.
+
+> Në një kompjuter tjetër: `git clone https://github.com/ReiElezi/RobloxGage-today.git`, pastaj shkarko `rojo.exe` (Hapi 1) dhe bëj Hapat 3–4.
+
+## Hapi 6 — Nisja automatike çdo ditë
+
+Kliko dy herë **`schedule-daily.bat`**. Programi niset vetë çdo ditë në orën e shkruar brenda skedarit (11:17). Ora ndryshon brenda skedarit.
+- Laptopi duhet të jetë i ndezur dhe ti i loguar në Windows në atë orë.
+- Çdo nisje ruhet te `logs\`.
+- Për ta ndaluar: **`unschedule-daily.bat`**.
+
+## Nisja me dorë (kur të duash)
 
 **Mënyra e thjeshtë:** kliko dy herë **`run-daily.bat`**.
 

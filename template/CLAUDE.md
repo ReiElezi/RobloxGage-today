@@ -50,3 +50,6 @@ The script that called you will publish `game.rbxlx` live to Roblox, so real pla
 14. **No fake rewards**: never show "free Robux", fake prizes, games of chance with Robux,
     or buttons that pretend to give something they don't.
 15. Do not use `loadstring`, `getfenv/setfenv`, or `require(<assetId>)`.
+16. **English only.** Every player-visible text (UI labels, buttons, hints, BillboardGui text,
+    signs, notifications, title, description) must be in English. No other languages anywhere
+    in the game, including code comments.

@@ -27,6 +27,11 @@ $OutputEncoding = [System.Text.UTF8Encoding]::new()
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 $Root = $PSScriptRoot
 
+# Ruaj gjithcka qe shfaqet ne logs\ (e dobishme kur niset vete nga Task Scheduler)
+$logDir = Join-Path $Root 'logs'
+New-Item -ItemType Directory -Force -Path $logDir | Out-Null
+try { Start-Transcript -Path (Join-Path $logDir ("run-" + (Get-Date -Format 'yyyy-MM-dd_HHmm') + ".txt")) | Out-Null } catch { }
+
 function Step($msg) { Write-Host "`n==> $msg" -ForegroundColor Cyan }
 function Warn($msg) { Write-Host "KUJDES: $msg" -ForegroundColor Yellow }
 function Fail($msg) { Write-Host "`nGABIM: $msg" -ForegroundColor Red; exit 1 }
@@ -112,6 +117,10 @@ function Test-Game([string]$dir, $game, [string[]]$previousTitles) {
     if ($code -match 'TextBox' -and $code -notmatch 'FilterStringAsync') {
         $p += 'Lojtaret shkruajne tekst (TextBox) por teksti nuk filtrohet me TextService:FilterStringAsync'
     }
+    # --- Vetem anglisht (titulli, pershkrimi, tekstet ne kod) ---
+    $nonEn = '[ëËçÇ]|\b(Fillo|Luaj|Dyqan|Bli|Monedha|Niveli|Fitove|Kliko|Shtyp)\b'
+    if ("$title $desc $([string]$game.howToPlay)" -match $nonEn) { $p += 'Titulli/pershkrimi nuk eshte ne anglisht (loja duhet te jete vetem anglisht)' }
+    if ($code -match $nonEn) { $p += 'Kodi ka tekst jo-anglisht (shkronja e/c shqipe ose fjale shqip) - te gjitha tekstet duhet te jene ne anglisht' }
     if ($code -match 'getfenv|setfenv|loadstring|require\(\s*\d') { $p += 'Kod i ndaluar/i rrezikshem (loadstring/require me ID)' }
     return $p
 }
@@ -281,3 +290,5 @@ foreach ($acc in $accounts) {
 
 Write-Host "`n================ PERMBLEDHJE ================" -ForegroundColor Cyan
 $summary | ForEach-Object { Write-Host " - $_" }
+
+try { Stop-Transcript | Out-Null } catch { }

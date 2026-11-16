@@ -3,6 +3,9 @@ Read CLAUDE.md in this folder first and follow every rule in it.
 
 This account's visual/creative style: {{STYLE}}
 
+LANGUAGE: The game is for an international audience. ALL player-visible text
+(title, description, UI, hints, signs, notifications) MUST be in English only.
+
 ## Step 1 — What earns the most on Roblox today
 Use WebSearch and WebFetch to find the CURRENT top 10 top-earning (top-grossing) Roblox experiences.
 Good sources: https://rotrends.com/experiences/TopEarning , https://www.roblox.com/charts ,
@@ -43,5 +46,6 @@ Metadata rules:
 - No brackets or tags in the title ([UPDATE], [x2], [EVENT]...), no ALL CAPS title.
 - No words like: free robux, giveaway, admin, update, event, limited, secret, OG, x2.
 - Never mention other games' names in the title or description.
+- Title, description and howToPlay are in English (only descriptionAlbanian is in Albanian).
 
 Do not try to publish anything yourself. When done, print a 3-line summary: title, genre, core loop.
