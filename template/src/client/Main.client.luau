@@ -1,0 +1,1 @@
+-- Placeholder. Claude Code e zëvendëson këtë skedar me kodin e klientit (UI) të lojës së ditës.

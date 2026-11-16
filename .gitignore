@@ -1,0 +1,7 @@
+# Sekrete dhe gjera lokale - mos i fut ne git
+config.json
+history.json
+games/
+rojo.exe
+*.rbxl
+*.rbxlx

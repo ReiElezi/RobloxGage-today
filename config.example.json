@@ -1,0 +1,20 @@
+{
+  "accounts": [
+    {
+      "name": "Llogaria 1",
+      "apiKeyEnv": "ROBLOX_API_KEY_1",
+      "style": "Bright, colorful, fast-paced games for younger players.",
+      "slots": [
+        { "name": "Loja A", "universeId": 0, "placeId": 0 }
+      ]
+    },
+    {
+      "name": "Llogaria 2",
+      "apiKeyEnv": "ROBLOX_API_KEY_2",
+      "style": "Calmer, cleaner look; collecting, building and progression games.",
+      "slots": [
+        { "name": "Loja B", "universeId": 0, "placeId": 0 }
+      ]
+    }
+  ]
+}
