@@ -127,7 +127,7 @@ jobs:
               $title = "Loje e re LIVE: $($r.title)"
               $body = "@$env:OWNER loja e re eshte LIVE ne Roblox!`n`n" +
                       "**$($r.title)** ($($r.genre))`n`n$($r.description)`n`n" +
-                      "Luaje: $($r.link)`n`nLojera bosh te mbetura ne rezerve: **$($r.slotsLeft)**"
+                      "Luaje: $($r.link)`n`nFotot: $($r.art)`n`nLojera bosh te mbetura ne rezerve: **$($r.slotsLeft)**"
               if ([int]$r.slotsLeft -le 3) { $body += "`n`n**KUJDES:** rezerva po mbaron - krijo lojera te reja bosh." }
             } elseif ($r.status -eq 'skipped') {
               $title = "Nuk u krijua loje (sot u publikua nje tashme)"

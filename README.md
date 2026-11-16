@@ -55,6 +55,7 @@ Nëse kontrolli dështon, programi i kërkon **një herë** Claude Code ta rregu
 3. Puna bëhet në serverat e GitHub (20–40 min). Laptopi mund të jetë i fikur.
 4. Kur mbaron, krijohet një **Issue** te repo-ja me titullin dhe lidhjen e lojës → të vjen **njoftim në aplikacionin GitHub** në telefon.
 5. Nëse mbeten ≤ 3 lojëra bosh, njoftimi të paralajmëron.
+6. Claude vizaton edhe **ikonën (512×512) dhe cover-in (1920×1080)** e lojës; programi i ngarkon dhe i vendos automatikisht në Roblox (Roblox i kontrollon para se të shfaqen). Çelësi API duhet të ketë edhe lejet `asset:read` dhe `asset:write`.
 
 Duhen 2 **GitHub Secrets** (Settings → Secrets and variables → Actions):
 - `CLAUDE_CODE_OAUTH_TOKEN` — nga komanda `claude setup-token` (abonimi yt Claude)

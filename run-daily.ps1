@@ -75,6 +75,89 @@ function Contains-Text([string]$haystack, [string]$needle) {
     return $haystack.IndexOf($needle, [System.StringComparison]::OrdinalIgnoreCase) -ge 0
 }
 
+# ---------------- Fotot e lojes (ikona + cover) ----------------
+function Find-Browser {
+    foreach ($b in @("$env:ProgramFiles\Google\Chrome\Application\chrome.exe",
+                     "${env:ProgramFiles(x86)}\Google\Chrome\Application\chrome.exe",
+                     "$env:LOCALAPPDATA\Google\Chrome\Application\chrome.exe",
+                     "${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe",
+                     "$env:ProgramFiles\Microsoft\Edge\Application\msedge.exe")) {
+        if ($b -and (Test-Path $b)) { return $b }
+    }
+    return $null
+}
+
+function Render-Html([string]$html, [string]$png, [int]$w, [int]$h) {
+    $browser = Find-Browser
+    if (-not $browser) { throw 'Chrome/Edge nuk u gjet per te bere foton' }
+    if (Test-Path $png) { Remove-Item $png -Force }
+    $url = 'file:///' + ($html -replace '\\', '/')
+    $prof = Join-Path ([IO.Path]::GetTempPath()) ('rd-chrome-' + [guid]::NewGuid())
+    $bArgs = @('--headless=new', '--disable-gpu', '--hide-scrollbars', '--no-first-run', "--user-data-dir=`"$prof`"",
+               "--window-size=$w,$h", '--virtual-time-budget=3000', "--screenshot=`"$png`"", "`"$url`"")
+    Start-Process -FilePath $browser -ArgumentList $bArgs -Wait -NoNewWindow | Out-Null
+    Remove-Item $prof -Recurse -Force -ErrorAction SilentlyContinue
+    if (-not (Test-Path $png) -or (Get-Item $png).Length -lt 2000) { throw "Fotoja $png nuk u krijua" }
+}
+
+function Invoke-Curl([string[]]$curlArgs) {
+    $out = & curl.exe -s -S @curlArgs 2>&1
+    if ($LASTEXITCODE -ne 0) { throw "curl deshtoi: $out" }
+    return ($out -join "`n")
+}
+
+function Upload-Image([string]$png, [string]$name, [string]$userId, [string]$hdr, [string]$apiBase) {
+    $req = Join-Path (Split-Path $png) ('req-' + [IO.Path]::GetFileNameWithoutExtension($png) + '.json')
+    @{ assetType = 'Image'; displayName = $name; description = $name
+       creationContext = @{ creator = @{ userId = $userId } } } | ConvertTo-Json -Depth 5 |
+        Set-Content -Path $req -Encoding ASCII
+    $raw = Invoke-Curl @('-X', 'POST', "$apiBase/assets/v1/assets", '-H', "@$hdr",
+        '--form', "request=<$req;type=application/json", '--form', "fileContent=@$png;type=image/png")
+    $r = $raw | ConvertFrom-Json
+    if (-not $r.operationId -and -not $r.path) { throw "ngarkimi i fotos deshtoi: $raw" }
+    $opId = if ($r.operationId) { $r.operationId } else { ($r.path -split '/')[-1] }
+    for ($i = 0; $i -lt 30; $i++) {
+        $opRaw = Invoke-Curl @("$apiBase/assets/v1/operations/$opId", '-H', "@$hdr")
+        $op = $opRaw | ConvertFrom-Json
+        if ($op.done) {
+            if ($op.response.assetId) { return [string]$op.response.assetId }
+            throw "foto pa assetId: $opRaw"
+        }
+        Start-Sleep -Seconds 3
+    }
+    throw 'ngarkimi i fotos nuk mbaroi ne kohe'
+}
+
+function Set-GameArt([string]$dir, $slot, $game, [string]$apiKey, [string]$apiBase, [string]$userId) {
+    $art = Join-Path $dir 'art'
+    $icon = Join-Path $art 'icon.png'; $cover = Join-Path $art 'cover.png'
+    Render-Html (Join-Path $art 'icon.html') $icon 512 512
+    Render-Html (Join-Path $art 'cover.html') $cover 1920 1080
+    $hdr = Join-Path ([IO.Path]::GetTempPath()) ('rd-h-' + [guid]::NewGuid() + '.txt')
+    Set-Content -Path $hdr -Value "x-api-key: $apiKey" -Encoding ASCII -NoNewline
+    try {
+        $title = [string]$game.title
+        $iconId = Upload-Image $icon "$title icon" $userId $hdr $apiBase
+        $coverId = Upload-Image $cover "$title cover" $userId $hdr $apiBase
+        $placeId = [int64]$slot.placeId
+        $ij = Join-Path $art 'set-icon.json'; $pj = Join-Path $art 'set-previews.json'
+        @{ assetId = $placeId; icon = "assets/$iconId" } | ConvertTo-Json | Set-Content -Path $ij -Encoding ASCII
+        @{ assetId = $placeId; previews = @(@{ asset = "assets/$coverId"; altText = $title }) } |
+            ConvertTo-Json -Depth 5 | Set-Content -Path $pj -Encoding ASCII
+        $notes = @()
+        $r1 = Invoke-Curl @('-X', 'PATCH', "$apiBase/assets/v1/assets/$($placeId)?updateMask=icon", '-H', "@$hdr",
+            '--form', "request=<$ij;type=application/json")
+        if ($r1 -match '"(code|error|errors)"') { $notes += "ikona: $r1" }
+        $r2 = Invoke-Curl @('-X', 'PATCH', "$apiBase/assets/v1/assets/$($placeId)?updateMask=previews", '-H', "@$hdr",
+            '--form', "request=<$pj;type=application/json")
+        if ($r2 -match '"(code|error|errors)"') { $notes += "cover: $r2" }
+        if ($notes) { throw ($notes -join ' | ') }
+        return 'ikona + cover u vendosen (Roblox i kontrollon para se te shfaqen)'
+    } finally {
+        Remove-Item $hdr -Force -ErrorAction SilentlyContinue
+    }
+}
+
 # Kontrollet e cilesise dhe kunder spam-it. Kthen listen e problemeve (bosh = OK).
 function Test-Game([string]$dir, $game, [string[]]$previousTitles) {
     $p = @()
@@ -112,6 +195,9 @@ function Test-Game([string]$dir, $game, [string[]]$previousTitles) {
     if ($code.Length -lt 6000) { $p += 'Kodi eshte shume i vogel per nje loje te plote' }
     if ($code -match 'Placeholder') { $p += 'Ka mbetur kod placeholder' }
     if (-not (Test-Path (Join-Path $dir 'DESIGN.md'))) { $p += 'Mungon DESIGN.md' }
+    foreach ($a in 'icon.html', 'cover.html') {
+        if (-not (Test-Path (Join-Path $dir "art\$a"))) { $p += "Mungon art/$a (fotoja e lojes - shiko Step 7 te prompt-it)" }
+    }
     if ($code -notmatch 'SpawnLocation') { $p += 'Nuk krijohet SpawnLocation' }
 
     # --- Siguria (Roblox mund ta heqe lojen pa filtrim teksti) ---
@@ -302,6 +388,17 @@ foreach ($acc in $accounts) {
             Write-Host "  $($game.description)"
         }
 
+        # Ikona dhe cover-i i lojes
+        $artStatus = 'pa foto'
+        try {
+            if (-not $acc.creatorUserId) { throw 'config.json: mungon creatorUserId per kete llogari' }
+            $artStatus = Set-GameArt -dir $dir -slot $slot -game $game -apiKey $apiKey -apiBase $apiBase -userId ([string]$acc.creatorUserId)
+            Write-Host "Fotot: $artStatus" -ForegroundColor Green
+        } catch {
+            $artStatus = "fotot deshtuan: $($_.Exception.Message)"
+            Warn $artStatus
+        }
+
         $history = @($history) + [pscustomobject]@{
             date    = $date
             account = [string]$acc.name
@@ -315,7 +412,7 @@ foreach ($acc in $accounts) {
         $left = $freeSlots.Count - 1
         $summary += "$($acc.name): '$($game.title)' ($($game.genre)) LIVE - $link"
         $results += [pscustomobject]@{ status = 'live'; account = [string]$acc.name; title = [string]$game.title
-            genre = [string]$game.genre; description = [string]$game.description; link = $link; slotsLeft = $left }
+            genre = [string]$game.genre; description = [string]$game.description; link = $link; slotsLeft = $left; art = $artStatus }
     } catch {
         Write-Host "`nGABIM te '$($acc.name)': $($_.Exception.Message)" -ForegroundColor Red
         $summary += "$($acc.name): GABIM - $($_.Exception.Message)"

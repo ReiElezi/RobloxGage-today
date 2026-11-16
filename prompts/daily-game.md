@@ -48,4 +48,15 @@ Metadata rules:
 - Never mention other games' names in the title or description.
 - Title, description and howToPlay are in English (only descriptionAlbanian is in Albanian).
 
+## Step 7 — Game icon and cover picture (required)
+Roblox shows a picture for every game. Draw them yourself as self-contained HTML files (inline CSS and inline SVG only,
+no external URLs, no images, no web fonts, no scripts needed):
+- `art/icon.html` — exactly 512x512 px (`html,body{margin:0;width:512px;height:512px;overflow:hidden}`): square game icon.
+- `art/cover.html` — exactly 1920x1080 px (same CSS with 1920/1080): wide cover/thumbnail for the game page.
+They must look like professional Roblox game art for THIS game: bold bright colors, the game title in big, thick,
+readable English letters with outline/shadow (title on the cover; title or a short word on the icon), and a clear
+illustration of the core idea drawn with SVG shapes (e.g. obby platforms in the sky, a runway, towers, a farm...).
+Fill the whole canvas (no white borders). Rules: no Roblox logo, no real people, no characters/logos from other games,
+no text promising rewards (no "FREE", "ROBUX", "x2", "UPDATE"), nothing scary or violent.
+
 Do not try to publish anything yourself. When done, print a 3-line summary: title, genre, core loop.

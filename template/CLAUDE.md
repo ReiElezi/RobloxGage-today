@@ -40,6 +40,7 @@ The script that called you will publish `game.rbxlx` live to Roblox, so real pla
 - Re-read every script for: nil indexing, misspelled service/property names, RemoteEvents used
   before they exist (use `WaitForChild` on the client), infinite yields, missing `task.wait`.
 - Write `game.json` (see the prompt for the exact format).
+- Draw `art/icon.html` (512x512) and `art/cover.html` (1920x1080) as described in the prompt.
 
 ## Roblox rules (the game is checked automatically before publishing)
 12. **Text filtering**: any text a player types that other players can see (names, signs,

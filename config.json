@@ -3,6 +3,7 @@
     {
       "name": "Llogaria 1",
       "apiKeyEnv": "ROBLOX_API_KEY_1",
+      "creatorUserId": 8038326534,
       "style": "Bright, colorful, fast-paced games for younger players.",
       "slots": [
         { "name": "Fresh Game Daily", "universeId": 10777186865, "placeId": 93084390023345 },
