@@ -279,11 +279,12 @@ foreach ($acc in $accounts) {
                 401 { 'API key i gabuar ose i skaduar.' }
                 403 { 'API key nuk ka universe-places: Write per kete loje, ose IP nuk lejohet. A e krijove key-n nga KJO llogari?' }
                 404 { 'universeId ose placeId gabim.' }
-                409 { 'placeId nuk i perket ketij universeId.' }
+                409 { 'Konflikt: zakonisht Team Create eshte ndezur per kete loje (fike te Studio: File > Collaborate / Experience Settings), ose placeId nuk i perket universeId.' }
                 429 { 'Shume kerkesa - provo pas 1 minute.' }
                 default { '' }
             }
-            throw "Publikimi deshtoi (HTTP $code). $hint $($_.Exception.Message)"
+            $detail = try { [string]$_.ErrorDetails.Message } catch { '' }
+            throw "Publikimi deshtoi (HTTP $code). $hint $($_.Exception.Message) $detail"
         }
 
         $link = "https://www.roblox.com/games/$($slot.placeId)"
