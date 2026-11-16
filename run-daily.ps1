@@ -236,7 +236,15 @@ foreach ($acc in $accounts) {
                         continue
         }
 
-        $slot = $slots[(Get-Date).DayOfYear % $slots.Count]
+        # Zgjedh slot-in: fillimisht ato qe s'jane perdorur kurre (sipas radhes ne config),
+        # pastaj ate qe eshte perditesuar me heret. Keshtu lojerat e diteve te fundit mbeten.
+        $slot = $null; $oldest = $null
+        foreach ($s in $slots) {
+            $last = @($history | Where-Object { [string]$_.placeId -eq [string]$s.placeId } |
+                      ForEach-Object { [string]$_.date } | Sort-Object) | Select-Object -Last 1
+            if (-not $last) { $slot = $s; break }
+            if (-not $oldest -or $last -lt $oldest) { $oldest = $last; $slot = $s }
+        }
         if (-not $Auto) {
             $ans = Read-Host "`nTa publikoj LIVE '$($game.title)' te '$($acc.name)' / '$($slot.name)'? (po/jo)"
             if ($ans -notmatch '^(p|po|y|yes)$') {

@@ -43,7 +43,7 @@ Nëse kontrolli dështon, programi i kërkon **një herë** Claude Code ta rregu
 1. **Mos i përdor 2 llogaritë për t'i rritur njëra-tjetrës vizitat, likes ose favorites.** Mos hyr me njërën llogari për të luajtur lojën e tjetrës për numra, dhe mos përdor bot-e. Kjo është manipulim.
 2. **Nëse njëra llogari merr ndalim (ban/warning), mos e vazhdo të njëjtën gjë me llogarinë tjetër.** Kjo është pikërisht ajo që ndalohet. Ndalo programin për atë llogari dhe kupto çfarë ndodhi.
 3. **Mos e përdor `-Force` çdo ditë.** Ekziston vetëm për rastin kur publikimi i parë doli me gabim.
-4. **Mos krijo shumë slot-e.** 1–3 lojëra për llogari mjaftojnë. 20 lojëra që ndryshojnë çdo ditë duken si spam.
+4. **Mos krijo shumë slot-e.** Kemi 7 lojëra për llogari (një për çdo ditë të javës). Mos shto shumë më tepër: dhjetëra lojëra që ndryshojnë vazhdimisht duken si spam.
 5. **Provoje lojën** (`-Preview`), sidomos javën e parë.
 
 ---
@@ -154,7 +154,7 @@ Për 2 llogari duhen rreth **20–60 minuta**. Në fund shfaqet përmbledhja me 
 
 ## Gjëra të rëndësishme
 
-- Çdo publikim **zëvendëson** lojën e mëparshme në atë slot.
+- Çdo ditë programi zgjedh një slot: fillimisht ato që s'janë përdorur kurrë, pastaj atë që është përditësuar më herët. Kështu **lojërat e 6 ditëve të fundit mbeten dhe luhen**; vetëm loja më e vjetër zëvendësohet.
 - **Titulli, përshkrimi dhe ikona nuk ndryshojnë automatikisht.** Programi t'i shfaq në fund: kopjoji te Creator Dashboard dhe përshtati me lojën e re, që të mos jenë mashtruese.
 - Çdo nisje harxhon nga limiti i abonimit tënd të Claude (2 lojëra = 2 herë më shumë).
 
