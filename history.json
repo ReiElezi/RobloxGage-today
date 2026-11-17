@@ -7,5 +7,14 @@
     "slot": "Fresh Game Daily",
     "placeId": 93084390023345,
     "version": 5
+  },
+  {
+    "date": "2026-11-17",
+    "account": "Llogaria 1",
+    "title": "Blossom Burst Garden",
+    "genre": "farming",
+    "slot": "Fresh Game Daily 2",
+    "placeId": 76759639764897,
+    "version": 5
   }
 ]
