@@ -16,5 +16,14 @@
     "slot": "Fresh Game Daily 2",
     "placeId": 76759639764897,
     "version": 5
+  },
+  {
+    "date": "2026-11-19",
+    "account": "Llogaria 1",
+    "title": "Lantern Hollow",
+    "genre": "horror survival",
+    "slot": "Fresh Game Daily 3",
+    "placeId": 125569715056924,
+    "version": 3
   }
 ]
