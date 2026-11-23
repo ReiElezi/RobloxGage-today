@@ -25,5 +25,14 @@
     "slot": "Fresh Game Daily 3",
     "placeId": 125569715056924,
     "version": 3
+  },
+  {
+    "date": "2026-11-23",
+    "account": "Llogaria 1",
+    "title": "Gummy Grove Nights",
+    "genre": "horror survival",
+    "slot": "Fresh Game Daily 4",
+    "placeId": 93497117715087,
+    "version": 3
   }
 ]
